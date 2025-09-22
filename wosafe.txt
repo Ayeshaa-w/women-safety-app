@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberGuard Pro - Advanced Threat Detection</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 75%, rgba(255, 215, 0, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.04) 0%, transparent 70%),
+                linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .demo-banner {
+            background: linear-gradient(90deg, #ff6b35, #f7931e, #ffd700);
+            color: #000;
+            text-align: center;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: bannerShine 3s ease-in-out infinite;
+        }
+        
+        @keyframes bannerShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .container {
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            padding: 32px 28px 24px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #00ffff, #ffd700, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.8px;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .subtitle {
+            color: #b0b0b0;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 28px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .camera-view {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            margin: 24px 28px;
+            width: calc(100% - 56px);
+            background: 
+                linear-gradient(145deg, #0f0f23, #1a1a2e),
+                radial-gradient(circle at center, rgba(0, 255, 255, 0.03) 0%, transparent 70%);
+            border-radius: 28px;
+            overflow: hidden;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 40px rgba(0, 255, 255, 0.1);
+        }
+        
+        .camera-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #666;
+            position: relative;
+        }
+        
+        .camera-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.3;
+        }
+        
+        .scanning-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg, 
+                    transparent 0%, 
+                    rgba(0, 255, 255, 0.1) 25%, 
+                    rgba(255, 215, 0, 0.15) 50%, 
+                    rgba(0, 255, 255, 0.1) 75%, 
+                    transparent 100%);
+            animation: holographicScan 4s ease-in-out infinite;
+            opacity: 0;
+            mix-blend-mode: screen;
+        }
+        
+        .scanning-overlay.active {
+            opacity: 1;
+        }
+        
+        @keyframes holographicScan {
+            0% { transform: translateX(-120%) translateY(-120%) rotate(45deg); }
+            50% { transform: translateX(0%) translateY(0%) rotate(45deg); }
+            100% { transform: translateX(120%) translateY(120%) rotate(45deg); }
+        }
+        
+        .detection-points {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .detection-point {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border: 3px solid #ff3366;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 51, 102, 0.3) 0%, rgba(255, 51, 102, 0.1) 70%);
+            animation: threatPulse 1.5s ease-in-out infinite;
+            opacity: 0;
+            box-shadow: 
+                0 0 30px rgba(255, 51, 102, 0.8),
+                inset 0 0 15px rgba(255, 51, 102, 0.4);
+        }
+        
+        .detection-point.active {
+            opacity: 1;
+        }
+        
+        .detection-point::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border: 2px solid rgba(255, 51, 102, 0.4);
+            border-radius: 50%;
+            animation: threatRipple 1.5s ease-out infinite;
+        }
+        
+        .detection-point::after {
+            content: '⚠️';
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            background: rgba(255, 51, 102, 0.9);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: white;
+            font-weight: 600;
+        }
+        
+        @keyframes threatPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        @keyframes threatRipple {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+        
+        .controls {
+            display: flex;
+            gap: 16px;
+            padding: 0 28px 24px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 18px 24px;
+            border: none;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00ffff, #0080ff, #8a2be2);
+            color: white;
+            box-shadow: 
+                0 10px 30px rgba(0, 255, 255, 0.4),
+                0 0 20px rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 15px 40px rgba(0, 255, 255, 0.5),
+                0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #00ffff;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 255, 0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .threat-alert {
+            margin: 0 28px 24px;
+            background: linear-gradient(135deg, #ff3366, #ff1744, #d50000);
+            border-radius: 24px;
+            padding: 28px;
+            text-align: center;
+            animation: criticalAlert 2s ease-in-out infinite;
+            display: none;
+            box-shadow: 
+                0 0 50px rgba(255, 51, 102, 0.6),
+                0 10px 40px rgba(255, 23, 68, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .threat-alert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: criticalShimmer 2s ease-in-out infinite;
+        }
+        
+        .threat-alert.active {
+            display: block;
+        }
+        
+        @keyframes criticalAlert {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 50px rgba(255, 51, 102, 0.6), 0 10px 40px rgba(255, 23, 68, 0.4);
+            }
+            50% { 
+                transform: scale(1.02); 
+                box-shadow: 0 0 80px rgba(255, 51, 102, 0.8), 0 15px 50px rgba(255, 23, 68, 0.6);
+            }
+        }
+        
+        @keyframes criticalShimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .status-panel {
+            margin: 0 28px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 24px;
+            padding: 28px;
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .status-item-large {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .status-item-large:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .status-label-large {
+            font-weight: 600;
+            color: #e0e0e0;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+        }
+        
+        .status-value-large {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 215, 0, 0.1));
+            color: #00ffff;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+        }
+        
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 0 28px 40px;
+        }
+        
+        .sensor-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sensor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00ffff, #ffd700, #ff6b35);
+            opacity: 0.7;
+        }
+        
+        .sensor-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.2);
+        }
+        
+        .sensor-value {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00ffff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        .sensor-label {
+            font-size: 11px;
+            color: #a0a0a0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .evidence-panel {
+            margin: 0 28px 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            padding: 28px;
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: none;
+        }
+        
+        .evidence-panel.active {
+            display: block;
+        }
+        
+        .evidence-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #00ffff;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        
+        .evidence-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .evidence-icon {
+            font-size: 20px;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .evidence-text {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .evidence-status {
+            color: #00ff88;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #00ff88);
+            width: 0%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-banner">
+        🚨 Professional Demo Interface - Advanced Security Prototype
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                🛡️ CyberGuard Pro
+            </div>
+            <div class="subtitle">Neural Threat Detection System</div>
+        </div>
+        
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-dot"></div>
+                <span>System Online</span>
+            </div>
+            <div class="status-item">
+                <span>🔒 Encrypted</span>
+            </div>
+            <div class="status-item">
+                <span>📡 Connected</span>
+            </div>
+        </div>
+        
+        <div class="camera-view" id="cameraView">
+            <div class="camera-grid"></div>
+            <div class="camera-placeholder">
+                <div style="font-size: 64px; margin-bottom: 20px; opacity: 0.6;">🎯</div>
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 12px; color: #00ffff;">Neural Vision Engine</div>
+                <div style="font-size: 13px; color: #888; margin-top: 8px;">Advanced Threat Detection Ready</div>
+            </div>
+            <div class="scanning-overlay" id="scanOverlay"></div>
+            <div class="detection-points" id="detectionPoints"></div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" id="scanBtn">
+                <span>⚡</span> Initialize Detection
+            </button>
+            <button class="btn btn-secondary" id="flashBtn">
+                <span>💡</span> IR Pulse
+            </button>
+        </div>
+        
+        <div class="threat-alert" id="threatAlert">
+            <div style="font-size: 28px; margin-bottom: 12px;">🚨 CRITICAL THREAT</div>
+            <div style="font-size: 18px; font-weight: 600;">Hidden surveillance device detected!</div>
+            <div style="font-size: 14px; margin-top: 12px; opacity: 0.9;">Initiating secure evidence collection protocol...</div>
+        </div>
+        
+        <div class="status-panel">
+            <div class="status-item-large">
+                <span class="status-label-large">Detection Status</span>
+                <span class="status-value-large" id="scanStatus">Standby</span>
+            </div>
+            <div class="status-item-large">
+                <span class="status-label-large">Anomalies Detected</span>
+                <span class="status-value-large" id="reflectionCount">0</span>
+            </div>
+            <div class="status-item-large">
+                <span class="status-label-large">GPS Coordinates</span>
+                <span class="status-value-large" id="gpsStatus">Acquiring...</span>
+            </div>
+            <div class="status-item-large">
+                <span class="status-label-large">Network Scan</span>
+                <span class="status-value-large" id="wifiCount">Analyzing...</span>
+            </div>
+        </div>
+        
+        <div class="sensor-grid">
+            <div class="sensor-card">
+                <div class="sensor-value" id="gyroValue">0.0°</div>
+                <div class="sensor-label">Gyroscope</div>
+            </div>
+            <div class="sensor-card">
+                <div class="sensor-value" id="accelValue">9.8</div>
+                <div class="sensor-label">Accelerometer</div>
+            </div>
+            <div class="sensor-card">
+                <div class="sensor-value" id="magnetValue">45μT</div>
+                <div class="sensor-label">Magnetometer</div>
+            </div>
+            <div class="sensor-card">
+                <div class="sensor-value" id="lightValue">350lx</div>
+                <div class="sensor-label">Photometer</div>
+            </div>
+        </div>
+        
+        <div class="evidence-panel" id="evidencePanel">
+            <div class="evidence-title">🔐 Secure Evidence Collection</div>
+            <div class="evidence-item">
+                <div class="evidence-icon">📹</div>
+                <div class="evidence-text">High-Resolution Video</div>
+                <div class="evidence-status">✓ Encrypted</div>
+            </div>
+            <div class="evidence-item">
+                <div class="evidence-icon">🎤</div>
+                <div class="evidence-text">Audio Recording</div>
+                <div class="evidence-status">✓ Secured</div>
+            </div>
+            <div class="evidence-item">
+                <div class="evidence-icon">📍</div>
+                <div class="evidence-text">GPS Location Data</div>
+                <div class="evidence-status">✓ Logged</div>
+            </div>
+            <div class="evidence-item">
+                <div class="evidence-icon">📶</div>
+                <div class="evidence-text">Network Environment</div>
+                <div class="evidence-status">✓ Captured</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="evidenceProgress"></div>
+            </div>
+            <div style="text-align: center; margin-top: 24px;">
+                <button class="btn btn-primary" style="width: 100%;" id="generateReport">
+                    📋 Generate Legal Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isScanning = false;
+        let scanInterval;
+        let sensorInterval;
+        let detectionCount = 0;
+        
+        const scanBtn = document.getElementById('scanBtn');
+        const flashBtn = document.getElementById('flashBtn');
+        const scanOverlay = document.getElementById('scanOverlay');
+        const scanStatus = document.getElementById('scanStatus');
+        const reflectionCount = document.getElementById('reflectionCount');
+        const threatAlert = document.getElementById('threatAlert');
+        const evidencePanel = document.getElementById('evidencePanel');
+        const detectionPoints = document.getElementById('detectionPoints');
+        const evidenceProgress = document.getElementById('evidenceProgress');
+        const generateReport = document.getElementById('generateReport');
+        
+        // Simulate advanced sensor readings
+        function updateSensorReadings() {
+            document.getElementById('gyroValue').textContent = 
+                (Math.random() * 360).toFixed(1) + '°';
+            document.getElementById('accelValue').textContent = 
+                (9.8 + (Math.random() - 0.5) * 2).toFixed(1);
+            document.getElementById('magnetValue').textContent = 
+                (40 + Math.random() * 20).toFixed(0) + 'μT';
+            document.getElementById('lightValue').textContent = 
+                (300 + Math.random() * 200).toFixed(0) + 'lx';
+        }
+        
+        // Simulate GPS and network detection
+        setTimeout(() => {
+            document.getElementById('gpsStatus').textContent = '40.7128, -74.0060';
+            document.getElementById('wifiCount').textContent = '15 networks';
+        }, 3000);
+        
+        // Start sensor simulation
+        sensorInterval = setInterval(updateSensorReadings, 600);
+        
+        scanBtn.addEventListener('click', function() {
+            if (!isScanning) {
+                startScan();
+            } else {
+                stopScan();
+            }
+        });
+        
+        flashBtn.addEventListener('click', function() {
+            // Enhanced flash simulation
+            flashBtn.style.background = 'linear-gradient(135deg, #ffd700, #ff6b35)';
+            flashBtn.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.8)';
+            setTimeout(() => {
+                flashBtn.style.background = '';
+                flashBtn.style.boxShadow = '';
+            }, 300);
+        });
+        
+        function startScan() {
+            isScanning = true;
+            scanBtn.innerHTML = '<span>⏹️</span> Terminate Scan';
+            scanBtn.style.background = 'linear-gradient(135deg, #ff3366, #ff1744)';
+            scanOverlay.classList.add('active');
+            scanStatus.textContent = 'Active Scan';
+            
+            // Advanced detection simulation
+            scanInterval = setInterval(() => {
+                if (Math.random() < 0.25) {
+                    addThreatDetection();
+                    detectionCount++;
+                    reflectionCount.textContent = detectionCount;
+                    
+                    // Trigger critical alert after 3 detections
+                    if (detectionCount >= 3) {
+                        triggerCriticalThreat();
+                    }
+                }
+            }, 2000);
+        }
+        
+        function stopScan() {
+            isScanning = false;
+            scanBtn.innerHTML = '<span>⚡</span> Initialize Detection';
+            scanBtn.style.background = 'linear-gradient(135deg, #00ffff, #0080ff, #8a2be2)';
+            scanOverlay.classList.remove('active');
+            scanStatus.textContent = 'Standby';
+            clearInterval(scanInterval);
+        }
+        
+        function addThreatDetection() {
+            const point = document.createElement('div');
+            point.className = 'detection-point active';
+            point.style.left = Math.random() * 75 + 12.5 + '%';
+            point.style.top = Math.random() * 75 + 12.5 + '%';
+            detectionPoints.appendChild(point);
+            
+            // Enhanced removal with fade
+            setTimeout(() => {
+                point.style.opacity = '0';
+                setTimeout(() => point.remove(), 500);
+            }, 4000);
+        }
+        
+        function triggerCriticalThreat() {
+            stopScan();
+            threatAlert.classList.add('active');
+            evidencePanel.classList.add('active');
+            
+            // Advanced evidence collection simulation
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 8;
+                evidenceProgress.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    generateReport.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
+                    generateReport.style.boxShadow = '0 10px 30px rgba(0, 255, 136, 0.4)';
+                }
+            }, 400);
+        }
+        
+        generateReport.addEventListener('click', function() {
+            // Professional report generation
+            const reportData = {
+                timestamp: new Date().toISOString(),
+                location: '40.7128, -74.0060',
+                detections: detectionCount,
+                threatLevel: 'CRITICAL',
+                evidence: {
+                    video: 'AES256_encrypted_video_hash_abc123def456',
+                    audio: 'AES256_encrypted_audio_hash_ghi789jkl012',
+                    gps_data: 'encrypted_location_hash_mno345pqr678',
+                    network_scan: 'encrypted_wifi_hash_stu901vwx234',
+                    sensor_data: 'encrypted_sensor_hash_yz567abc890'
+                }
+            };
+            
+            alert('🔐 SECURE LEGAL REPORT GENERATED\n\n' + 
+                  '📋 Report ID: CG-' + Date.now() + '\n' +
+                  '⏰ Timestamp: ' + reportData.timestamp + '\n' +
+                  '📍 Location: ' + reportData.location + '\n' +
+                  '🚨 Threat Level: ' + reportData.threatLevel + '\n' +
+                  '🎯 Detections: ' + reportData.detections + '\n\n' +
+                  '🔒 All evidence encrypted with AES-256\n' +
+                  '⚖️ Legal-grade documentation complete\n' +
+                  '📤 Ready for law enforcement submission');
+        });
+        
+        // Initialize with professional sensor readings
+        updateSensorReadings();
+        
+        // Add subtle background animations
+        setInterval(() => {
+            document.querySelectorAll('.sensor-card').forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.transform = 'translateY(-2px)';
+                    setTimeout(() => {
+                        card.style.transform = '';
+                    }, 200);
+                }, index * 100);
+            });
+        }, 8000);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9833e35bf19c7efa',t:'MTc1ODU2NTk3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
